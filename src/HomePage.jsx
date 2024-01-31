@@ -1,38 +1,49 @@
 import React, { useState } from 'react'
+import ReactLoading from 'react-loading';
+const HomePage = ({type,color}) => {
 
-const HomePage = () => {
+    //useState 
     const [qr,setQr]=useState("")
     const [size,setSize]=useState("")
     const [img,setImg]=useState("")
     const [url,setUrl]=useState("")
 
+
+    //Generating Qr code image
     const generateQr=()=>{
         const url=`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qr)}`
         console.log(url)
+        //setting url and image using useState
          setUrl(url)
          setImg(url)
     }
+
+    //Download QR_code image
     const downloadQr=()=>{
-        fetch(img)
-        .then((Response)=>Response.blob())
+        fetch(url)
+        //Getting BLOB(Binary Large Object) from response 
+        .then(Response=>Response.blob())
         .then((blob)=>{
-             const tag=document.createElement("a")
-             tag.href=URL.createObjectURL(blob)
-            tag.download="qr.png"
-            document.body.appendChild(tag)
-            tag.click()
-            document.body.removeChild(tag)
-    }
-        
-        )
-        .catch((error)=>console.error(error))
+        //creation of Anchor Tag
+           const createATag=document.createElement("a")
+           //convertion of img from BLOB
+           createATag.href=URL.createObjectURL(blob)
+           //Substituting appropiate name for image
+           createATag.download="QR.png"
+           //appending and removing of the Anchor tag
+           document.body.appendChild(createATag)
+           createATag.click()
+           document.body.removeChild(createATag)
+        })
     }
   return (
     <>
     <div className='wrapper'>
         <h1>Qr code generator</h1>
-        {img && <img src=
-        {img} className='img' alt="" />}
+
+        {/* conditionally rendering image */}
+        {img && <img src={img} className='img' alt="" />}
+
         <div className='input-box'>
             <input type="text"  placeholder='Enter the text to encode' value={qr}
             onChange={(e)=>setQr(e.target.value)}
@@ -40,7 +51,6 @@ const HomePage = () => {
             <input type="text"  placeholder='Enter the size of the img' value={size}
             onChange={(e)=>setSize(e.target.value)}
             />
-
         </div>
         <div className='buttons'>
             <button onClick={generateQr} >Generate QR</button>
